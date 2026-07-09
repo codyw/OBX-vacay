@@ -1417,7 +1417,7 @@ body.locked .app { visibility: hidden; }
   <span class="lbl">Until departure</span>
   <span class="val" id="strip-cd">--</span>
   <span class="sep">·</span>
-  <span class="dates">Jul 12 → Jul 26, 2026</span>
+  <span class="dates">Jul 11 → Jul 26, 2026</span>
 </div>
 
 <main class="app" id="app">
@@ -1427,7 +1427,7 @@ body.locked .app { visibility: hidden; }
     <div class="hero">
       <div class="hero-eyebrow">Outer Banks · North Carolina</div>
       <h1 class="hero-title">Morse <span class="ital">OBX</span></h1>
-      <div class="hero-dates">Sun Jul 12 <span class="arrow">→</span> Sun Jul 26 · 2026</div>
+      <div class="hero-dates">Sat Jul 11 <span class="arrow">→</span> Sun Jul 26 · 2026</div>
     </div>
 
     <!-- OVERVIEW -->
@@ -1828,27 +1828,26 @@ function tick() {
   const diff = TARGET - now;
   const today = new Date();
   today.setHours(0,0,0,0);
-  const badge = document.getElementById('brand-badge');
+  const badge  = document.getElementById('brand-badge');
+  const strip  = document.querySelector('.strip');
   const stripCd = document.getElementById('strip-cd');
 
-  // Live trip — show Day X of 14 in nav
-  if (today >= TRIP_S && today <= TRIP_E) {
-    const dayN = Math.floor((today - TRIP_S) / 86400000) + 1;
-    badge.textContent = 'Day ' + dayN + ' / 14';
-    badge.classList.add('live');
-    stripCd.textContent = 'In Corolla';
-    return;
-  }
-
-  // Post-trip
+  // Once departure time has passed — hide strip entirely
   if (diff <= 0) {
-    badge.textContent = '';
-    badge.classList.remove('live');
-    stripCd.textContent = 'Trip complete · sea you next year';
+    if (strip) strip.style.display = 'none';
+    // Still show Day X of 14 in nav badge during trip
+    if (today >= TRIP_S && today <= TRIP_E) {
+      const dayN = Math.floor((today - TRIP_S) / 86400000) + 1;
+      badge.textContent = 'Day ' + dayN + ' / 14';
+      badge.classList.add('live');
+    } else {
+      badge.textContent = '';
+      badge.classList.remove('live');
+    }
     return;
   }
 
-  // Pre-trip
+  // Pre-departure countdown
   const d = Math.floor(diff / 86400000);
   const h = Math.floor((diff % 86400000) / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
