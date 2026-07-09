@@ -1242,6 +1242,149 @@ body.locked .app { visibility: hidden; }
   font-size: 12px;
   color: var(--ink-4);
 }
+/* ───────────────────────────────
+   COLLAPSIBLE HOUSE DETAILS
+─────────────────────────────── */
+.toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 0 0;
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--teal);
+  background: none;
+  border: none;
+  border-top: 1px solid var(--rule-light);
+  margin-top: 14px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(47,110,129,0.12);
+  min-height: 44px;
+}
+.toggle-btn .chev {
+  font-size: 13px;
+  transition: transform 0.25s;
+  display: inline-block;
+  line-height: 1;
+}
+.toggle-btn.open .chev { transform: rotate(180deg); }
+.collapsible { display: none; }
+.collapsible.open { display: block; }
+
+/* ───────────────────────────────
+   TRIP OVERVIEW CARD
+─────────────────────────────── */
+.overview-card {
+  background: var(--paper);
+  border: 1px solid var(--rule-light);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 14px;
+}
+.overview-card .oc-label {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+.crew-names {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 19px;
+  color: var(--navy);
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+/* JOURNEY CARDS */
+.journey-card {
+  background: var(--paper);
+  border: 1px solid var(--rule-light);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 14px;
+}
+.jc-eyebrow {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 6px;
+}
+.jc-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 22px;
+  color: var(--navy);
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+.jc-row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--rule-light);
+  font-size: 13.5px;
+}
+.jc-row:last-of-type { border-bottom: none; }
+.jc-when {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal);
+  padding-top: 2px;
+}
+.jc-what { color: var(--ink-2); line-height: 1.45; }
+.jc-what strong { font-family: var(--serif); color: var(--navy); font-weight: 500; }
+.jc-maps {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 10px 16px;
+  background: var(--navy);
+  color: var(--cream);
+  border-radius: var(--radius-pill);
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  min-height: 44px;
+}
+.jc-maps:active { opacity: 0.8; }
+.jc-maps .pin { font-size: 14px; }
+.jc-detail {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule-light);
+  line-height: 1.55;
+}
+.jc-detail .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  gap: 12px;
+}
+.jc-detail .row .k { color: var(--ink-3); font-style: italic; }
+.jc-detail .row .v { color: var(--navy); font-weight: 500; text-align: right; }
 </style>
 </head>
 <body class="locked">
@@ -1283,141 +1426,130 @@ body.locked .app { visibility: hidden; }
   <section class="page active" id="page-trip" data-page="trip">
     <div class="hero">
       <div class="hero-eyebrow">Outer Banks · North Carolina</div>
-      <h1 class="hero-title">Morse <span class="ital">at the sea</span></h1>
-      <p class="hero-sub">Fourteen unhurried nights on Windance Lane — sand between the toes, donuts in the morning, lighthouse on the horizon.</p>
+      <h1 class="hero-title">Morse <span class="ital">OBX</span></h1>
       <div class="hero-dates">Sun Jul 12 <span class="arrow">→</span> Sun Jul 26 · 2026</div>
     </div>
 
+    <!-- OVERVIEW -->
     <div class="section-head">
       <span class="section-num">i.</span>
-      <h2 class="section-title">The Particulars</h2>
-    </div>
-    <div class="facts">
-      <div class="fact-card">
-        <div class="fact-label">The Crew · 8</div>
-        <div class="crew-list" style="font-family: var(--serif); font-size: 18px; color: var(--navy); line-height: 1.7; letter-spacing: 0.04em;">
-          M · C · R · S · Z · J · G · T
-        </div>
-        <div style="font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--ink-3); margin-top: 8px;">All together for two weeks</div>
-      </div>
-      <div class="fact-card">
-        <div class="fact-label">The Stay</div>
-        <div class="fact-body">
-          Dear Summer
-          <span class="pair">5 bed · 4.5 bath · sleeps 10</span>
-          <span class="small">Pool · hot tub · game room · ~500 yds to beach</span>
-        </div>
-      </div>
-      <div class="fact-card">
-        <div class="fact-label">Check-in / Out</div>
-        <div class="fact-body">
-          Sun Jul 12 · 5:00 PM
-          <span class="pair">Sun Jul 26 · 10:00 AM</span>
-          <span class="small">14 nights</span>
-        </div>
-      </div>
-      <div class="fact-card">
-        <div class="fact-label">The Convoy</div>
-        <div class="car-row"><span class="car-emoji">🚙</span><div><div class="car-name">Magic Vaycay Truck</div><div class="car-who">J &amp; G · R, S, Z</div></div></div>
-        <div class="car-row"><span class="car-emoji">🚗</span><div><div class="car-name">Pushing 40</div><div class="car-who">M, C &amp; T</div></div></div>
-      </div>
+      <h2 class="section-title">Overview</h2>
     </div>
 
-    <div class="section-head" style="margin-top:28px;">
+    <div class="overview-card">
+      <div class="oc-label">The Crew · 8</div>
+      <div class="crew-names">Mandy · Cody · Reagan · Sadie · Zoey · Papa · GG · TyTy</div>
+    </div>
+
+    <div class="overview-card">
+      <div class="oc-label">The Convoy</div>
+      <div class="car-row"><span class="car-emoji">🚙</span><div><div class="car-name">Magic Vaycay Truck</div><div class="car-who">Papa &amp; GG · Reagan, Sadie &amp; Zoey</div></div></div>
+      <div class="car-row"><span class="car-emoji">🚗</span><div><div class="car-name">Pushing 40</div><div class="car-who">Mandy, Cody &amp; TyTy</div></div></div>
+    </div>
+
+    <!-- TO DC -->
+    <div class="section-head" style="margin-top:24px;">
       <span class="section-num">ii.</span>
-      <h2 class="section-title">Heading South</h2>
-      <span class="section-sub">Sat Jul 11 → Sun Jul 12</span>
-    </div>
-    <div class="drive-grid">
-      <div class="drive-card">
-        <div class="drive-direction">Down · Sat Jul 11 → Sun Jul 12</div>
-        <div class="drive-title">Heading South, via DC</div>
-        <div class="drive-leg"><div class="drive-when">Sat 4 AM</div><div class="drive-what">Leave <strong>Plainfield</strong></div></div>
-        <div class="drive-leg"><div class="drive-when">Sat ~3 PM</div><div class="drive-what">Arrive <strong>Hampton Inn &amp; Suites Falls Church</strong> · check-in 3 PM</div></div>
-        <div class="drive-leg"><div class="drive-when">Sun AM</div><div class="drive-what">Into DC · <strong>Lincoln Memorial</strong> + <strong>Washington Monument</strong> · checkout noon</div></div>
-        <div class="drive-leg"><div class="drive-when">Sun midday</div><div class="drive-what">Back on the road · ~5 hr to Corolla</div></div>
-        <div class="drive-leg"><div class="drive-when">Sun ~5 PM</div><div class="drive-what">Arrive <strong>Corolla</strong> · right at check-in</div></div>
-        <div class="stop-options">
-          <div class="stop-options-title">Overnight stop</div>
-          <ul>
-            <li><a href="https://maps.apple.com/?q=6430+Arlington+Blvd,+Falls+Church,+VA+22042">Hampton Inn &amp; Suites Falls Church</a><span class="desc">6430 Arlington Blvd, Falls Church, VA 22042 · 1 night, 3 rooms</span></li>
-            <li>Room: 2 Queens, microwave &amp; fridge, non-smoking<span class="desc">Confirmation #81892378 · 2 more confirmations TBD</span></li>
-          </ul>
-        </div>
-        <div class="route-sketch">Route sketch: I-80 E → I-76 E (PA Turnpike) → I-70 E → I-270 S → I-495 S into Falls Church. Sunday: I-66/Memorial Bridge into DC, then I-395 S → I-95 S → I-64 E → US-168 S → US-158 → NC-12 N to Corolla. Run live nav — DC weekend traffic varies.</div>
-      </div>
+      <h2 class="section-title">To DC</h2>
+      <span class="section-sub">Sat Jul 11</span>
     </div>
 
-    <div class="section-head" style="margin-top:28px;">
+    <div class="journey-card">
+      <div class="jc-eyebrow">Leg 1 · Sat Jul 11</div>
+      <div class="jc-title">Falls Church, VA</div>
+      <div class="jc-row"><div class="jc-when">4:00 AM</div><div class="jc-what">Leave <strong>Plainfield, IL</strong></div></div>
+      <div class="jc-row"><div class="jc-when">~3:00 PM</div><div class="jc-what">Arrive <strong>Hampton Inn &amp; Suites Falls Church</strong> · check-in 3 PM · checkout noon</div></div>
+      <div class="jc-row"><div class="jc-when">Evening</div><div class="jc-what">Settle in · dinner nearby</div></div>
+      <div class="jc-detail">
+        <div class="row"><span class="k">Hotel</span><span class="v">6430 Arlington Blvd, Falls Church, VA 22042</span></div>
+        <div class="row"><span class="k">Rooms</span><span class="v">3 rooms · 2 Queens each</span></div>
+        <div class="row"><span class="k">Confirmation</span><span class="v">#81892378</span></div>
+      </div>
+      <a class="jc-maps" href="https://maps.apple.com/?saddr=Plainfield,+IL&daddr=6430+Arlington+Blvd,+Falls+Church,+VA+22042">
+        <span class="pin">📍</span> Navigate to Falls Church
+      </a>
+    </div>
+
+    <!-- TO OBX -->
+    <div class="section-head" style="margin-top:24px;">
       <span class="section-num">iii.</span>
-      <h2 class="section-title">Dear Summer</h2>
-      <span class="section-sub">three levels, room for all</span>
+      <h2 class="section-title">To OBX</h2>
+      <span class="section-sub">Sun Jul 12</span>
     </div>
-    <div class="house-grid">
-      <div class="house-main">
-        <div class="house-name">Dear Summer<span class="formerly">formerly Victorian Fan Ta Sea · once featured on TLC's Jon &amp; Kate Plus 8</span></div>
-        <a class="house-addr" href="https://maps.apple.com/?q=1249+Windjammer+Court,+Corolla,+NC+27927">
-          1249 Windjammer Court, Corolla, NC 27927
-          <span class="small">Tap to open in Maps</span>
-        </a>
-        <div class="layout-row"><div class="layout-floor">Top Level</div><div class="layout-detail">Living · kitchen · dining · den w/ sleeper sofa · ½ bath · Master King + bath · sun deck · gazebo</div></div>
-        <div class="layout-row"><div class="layout-floor">Mid Level</div><div class="layout-detail">Additional bedrooms · exact bed config TBD from rental docs</div></div>
-        <div class="layout-row"><div class="layout-floor">Ground Level</div><div class="layout-detail">Game room (pool · ping pong · foosball) · wet bar + beverage fridge · ½ bath · laundry · outdoor shower · pool access</div></div>
+
+    <div class="journey-card">
+      <div class="jc-eyebrow">Leg 2 · Sun Jul 12</div>
+      <div class="jc-title">Corolla, NC</div>
+      <div class="jc-row"><div class="jc-when">Morning</div><div class="jc-what">DC · <strong>Lincoln Memorial</strong> + <strong>Washington Monument</strong></div></div>
+      <div class="jc-row"><div class="jc-when">Midday</div><div class="jc-what">Leave Falls Church · ~5 hr drive south</div></div>
+      <div class="jc-row"><div class="jc-when">5:00 PM</div><div class="jc-what">Check-in <strong>Dear Summer</strong> · code 174216 → bottom-left button</div></div>
+      <div class="jc-row"><div class="jc-when">Evening</div><div class="jc-what">🛒 Grocery run</div></div>
+      <div class="jc-detail">
+        <div class="row"><span class="k">Address</span><span class="v">1249 Windjammer Court, Corolla, NC 27927</span></div>
+        <div class="row"><span class="k">Check-in</span><span class="v">5:00 PM · code active then</span></div>
+        <div class="row"><span class="k">Wi-Fi</span><span class="v">MySpectrumWiFiC6 · studioduty112</span></div>
+        <div class="row"><span class="k">Hot tub</span><span class="v">under 16 not permitted</span></div>
       </div>
-      <div class="amenities">
-        <div class="amen-title">Amenities</div>
-        <ul class="amen-list">
-          <li>Private 16'×32' saltwater pool</li>
-          <li>Hot tub</li>
-          <li>Charcoal grill (new for 2026)</li>
-          <li>Bicycles &amp; beach chairs for guest use</li>
-          <li>Mini-fridge &amp; cabinet on the porch</li>
-          <li>Outdoor shower</li>
-          <li>Two single-car carports</li>
-          <li>Community pool, tennis, playground</li>
-          <li>Linens &amp; towels included</li>
-          <li>Dogs welcome</li>
-          <li>Keyless entry (code activates at 5 PM)</li>
-          <li>$35/night beach gear rental credit</li>
-        </ul>
-        <div class="dont-forget">
-          <div class="dont-forget-title">Don't Forget</div>
-          <div class="df-item"><span>Wi-Fi</span><span class="val">MySpectrumWiFiC6 · studioduty112</span></div>
-          <div class="df-item"><span>Router</span><span class="val">TL living room, near TV</span></div>
-          <div class="df-item"><span>Entry code</span><span class="val">174216 → press bottom-left button · active 5 PM</span></div>
-          <div class="df-item"><span>Checkout code</span><span class="val">123456* → auto-notifies Seaside</span></div>
-          <div class="df-item"><span>Beds</span><span class="val">linens on beds, not made — you make them</span></div>
-          <div class="df-item"><span>Hot tub</span><span class="val">under 16 not permitted · shower before &amp; after</span></div>
-          <div class="df-item"><span>Pool tech</span><span class="val">mid-week service visit during stay</span></div>
-          <div class="df-item"><span>Trash</span><span class="val">black &amp; brown cans · to street night before pickup</span></div>
-          <div class="df-item"><span>Parking</span><span class="val">driveway/carport · no overnight in community lots</span></div>
-          <div class="df-item"><span>Pets</span><span class="val">welcome · not in pool or hot tub</span></div>
+      <a class="jc-maps" href="https://maps.apple.com/?saddr=6430+Arlington+Blvd,+Falls+Church,+VA+22042&daddr=1249+Windjammer+Court,+Corolla,+NC+27927">
+        <span class="pin">📍</span> Navigate to Dear Summer
+      </a>
+
+      <button class="toggle-btn" id="house-toggle">
+        House Details <span class="chev">▾</span>
+      </button>
+      <div class="collapsible" id="house-details">
+        <div class="house-grid" style="margin-top:14px;">
+          <div class="house-main">
+            <div class="house-name">Dear Summer<span class="formerly">formerly Victorian Fan Ta Sea · once featured on TLC's Jon &amp; Kate Plus 8</span></div>
+            <div class="layout-row"><div class="layout-floor">Top Level</div><div class="layout-detail">Living · kitchen · dining · den w/ sleeper sofa · ½ bath · Master King + bath · sun deck · gazebo</div></div>
+            <div class="layout-row"><div class="layout-floor">Mid Level</div><div class="layout-detail">Additional bedrooms</div></div>
+            <div class="layout-row"><div class="layout-floor">Ground Level</div><div class="layout-detail">Game room (pool · ping pong · foosball) · wet bar + beverage fridge · ½ bath · laundry · outdoor shower · pool access</div></div>
+          </div>
+          <div class="amenities">
+            <div class="amen-title">Amenities</div>
+            <ul class="amen-list">
+              <li>Private 16'×32' saltwater pool</li>
+              <li>Hot tub</li>
+              <li>Charcoal grill (new for 2026)</li>
+              <li>Bicycles &amp; beach chairs for guest use</li>
+              <li>Mini-fridge &amp; cabinet on the porch</li>
+              <li>Outdoor shower</li>
+              <li>Two single-car carports</li>
+              <li>Community pool, tennis, playground</li>
+              <li>Linens &amp; towels included · beds not made</li>
+              <li>Dogs welcome · not in pool or hot tub</li>
+              <li>Keyless entry · $35/night beach gear credit</li>
+            </ul>
+            <div class="dont-forget">
+              <div class="dont-forget-title">Don't Forget</div>
+              <div class="df-item"><span>Router</span><span class="val">TL living room, near TV</span></div>
+              <div class="df-item"><span>Entry code</span><span class="val">174216 → bottom-left button</span></div>
+              <div class="df-item"><span>Checkout code</span><span class="val">123456* → auto-notifies Seaside</span></div>
+              <div class="df-item"><span>Pool tech</span><span class="val">mid-week service visit</span></div>
+              <div class="df-item"><span>Trash</span><span class="val">black &amp; brown cans · to street night before</span></div>
+              <div class="df-item"><span>Parking</span><span class="val">driveway/carport only</span></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="ref-card" style="margin-top:14px;">
-      <div class="ref-title">Pack This</div>
-      <div class="ref-row"><span class="ref-key">Starter kit provided</span><span class="ref-val">2 TP rolls · paper towel · liner · sponge · dishwasher packet</span></div>
-      <div class="ref-row"><span class="ref-key">Bathrooms</span><span class="ref-val">Hand soap · shampoo &amp; toiletries · extra TP</span></div>
-      <div class="ref-row"><span class="ref-key">Kitchen</span><span class="ref-val">Coffee + filters · condiments · spices · foil · ziploc · garbage bags · dish soap</span></div>
-      <div class="ref-row"><span class="ref-key">General</span><span class="ref-val">Laundry detergent · all-purpose cleaner · first aid kit · chargers</span></div>
-    </div>
-
-    <div class="section-head" style="margin-top:28px;">
+    <!-- TO HOME -->
+    <div class="section-head" style="margin-top:24px;">
       <span class="section-num">iv.</span>
-      <h2 class="section-title">Heading Home</h2>
+      <h2 class="section-title">To Home</h2>
       <span class="section-sub">Sun Jul 26 · straight through</span>
     </div>
-    <div class="drive-grid">
-      <div class="drive-card">
-        <div class="drive-direction">Back · Sun Jul 26 · straight through</div>
-        <div class="drive-title">Heading Home</div>
-        <div class="drive-leg"><div class="drive-when">Sun 10 AM</div><div class="drive-what">Check out · last beach pic on the way out</div></div>
-        <div class="drive-leg"><div class="drive-when">Sun ~10:15 AM</div><div class="drive-what">Wheels rolling · no overnight this time, one straight push</div></div>
-        <div class="drive-leg"><div class="drive-when">Sun late night</div><div class="drive-what">Home to <strong>Plainfield</strong> · ~16 hr drive, swap drivers along the way</div></div>
-        <div class="route-sketch">Route sketch: NC-12 S → US-158 → US-168 N → I-64 W → I-81 N → I-70/68 W → I-76 W (PA Turnpike) → I-80 W to Plainfield. No DC detour on the way home. Long single day — plan for stops and driver swaps.</div>
-      </div>
+
+    <div class="journey-card">
+      <div class="jc-eyebrow">Leg 3 · Sun Jul 26</div>
+      <div class="jc-title">Plainfield, IL</div>
+      <div class="jc-row"><div class="jc-when">10:00 AM</div><div class="jc-what">Check out · checkout code <strong>123456*</strong> → auto-notifies Seaside</div></div>
+      <div class="jc-row"><div class="jc-when">~10:15 AM</div><div class="jc-what">Wheels rolling · one straight push home</div></div>
+      <div class="jc-row"><div class="jc-when">Late night</div><div class="jc-what">Arrive <strong>Plainfield, IL</strong> · ~16 hr drive · swap drivers along the way</div></div>
+      <a class="jc-maps" href="https://maps.apple.com/?saddr=1249+Windjammer+Court,+Corolla,+NC+27927&daddr=Plainfield,+IL">
+        <span class="pin">📍</span> Navigate to Plainfield
+      </a>
     </div>
 
     <div class="page-foot">↔ swipe between pages · or use the dropdown above</div>
@@ -1608,24 +1740,21 @@ body.locked .app { visibility: hidden; }
 
     <div class="sub-head">Numbers &amp; Logistics — tap to call</div>
     <div class="ref-card phone-list">
-      <div class="phone-row"><div class="phone-label">Seaside Vacations<span class="sub">Property manager</span></div><a class="phone-num" href="tel:+12522615500">252-261-5500</a></div>
-      <div class="phone-row"><div class="phone-label">Seaside Vacations<span class="sub">Toll-free</span></div><a class="phone-num" href="tel:+18003952525">800-395-2525</a></div>
-      <div class="phone-row"><div class="phone-label">Seaside Vacations Email<span class="sub">rentals@seasideobx.com</span></div><a class="phone-num" href="mailto:rentals@seasideobx.com">Email</a></div>
       <div class="phone-row">
-        <div class="phone-label"><a href="https://maps.apple.com/?q=4800+S+Croatan+Hwy,+Nags+Head,+NC+27959" style="color:inherit;text-decoration:none;">Outer Banks Health Hospital</a><span class="sub">4800 S Croatan Hwy, Nags Head · ~1 hr · 24 hrs ER</span></div>
-        <a class="phone-num" href="tel:+12524494500">252-449-4500</a>
+        <a href="https://maps.apple.com/?q=Seaside+Vacations,+Kitty+Hawk,+NC" class="phone-label" style="text-decoration:none;color:inherit;">Seaside Vacations<span class="sub">rentals@seasideobx.com</span></a>
+        <a class="phone-num" href="mailto:rentals@seasideobx.com" style="font-size:12px;">Email</a>
       </div>
       <div class="phone-row">
-        <div class="phone-label"><a href="https://maps.apple.com/?q=1129+Corolla+Village+Rd,+Corolla,+NC+27927" style="color:inherit;text-decoration:none;">Lighthouse Medical Care</a><span class="sub">1129 Corolla Village Rd · in Corolla · cash/credit only</span></div>
-        <a class="phone-num" href="tel:+12525971157">252-597-1157</a>
+        <a href="https://maps.apple.com/?q=4800+S+Croatan+Hwy,+Nags+Head,+NC+27959" class="phone-label" style="text-decoration:none;color:inherit;">Outer Banks Health Hospital<span class="sub">4800 S Croatan Hwy, Nags Head · 24 hrs ER · ~1 hr south</span></a>
       </div>
       <div class="phone-row">
-        <div class="phone-label"><a href="https://maps.apple.com/?q=5547+N+Croatan+Hwy,+Southern+Shores,+NC+27949" style="color:inherit;text-decoration:none;">CVS Pharmacy</a><span class="sub">5547 N Croatan Hwy, Southern Shores · ~20 min south</span></div>
-        <a class="phone-num" href="tel:+12522618097">252-261-8097</a>
+        <a href="https://maps.apple.com/?q=1129+Corolla+Village+Rd,+Corolla,+NC+27927" class="phone-label" style="text-decoration:none;color:inherit;">Lighthouse Medical Care<span class="sub">1129 Corolla Village Rd · in Corolla · cash/credit only</span></a>
       </div>
       <div class="phone-row">
-        <div class="phone-label"><a href="https://maps.apple.com/?q=805+Ocean+Trail,+Corolla,+NC+27927" style="color:inherit;text-decoration:none;">Food Lion Corolla</a><span class="sub">805 Ocean Trail · closest grocery · 7 AM–10 PM daily</span></div>
-        <a class="phone-num" href="tel:+12524534544">252-453-4544</a>
+        <a href="https://maps.apple.com/?q=5547+N+Croatan+Hwy,+Southern+Shores,+NC+27949" class="phone-label" style="text-decoration:none;color:inherit;">CVS Pharmacy<span class="sub">5547 N Croatan Hwy, Southern Shores · ~20 min south</span></a>
+      </div>
+      <div class="phone-row">
+        <a href="https://maps.apple.com/?q=805+Ocean+Trail,+Corolla,+NC+27927" class="phone-label" style="text-decoration:none;color:inherit;">Food Lion Corolla<span class="sub">805 Ocean Trail · closest grocery · 7 AM–10 PM daily</span></a>
       </div>
     </div>
   </section>
@@ -1827,6 +1956,18 @@ document.querySelectorAll('.subtab').forEach(btn => {
     });
   });
 });
+
+// ═══════════════════════════════════════════
+// HOUSE DETAILS TOGGLE
+// ═══════════════════════════════════════════
+const houseToggle = document.getElementById('house-toggle');
+const houseDetails = document.getElementById('house-details');
+if (houseToggle && houseDetails) {
+  houseToggle.addEventListener('click', () => {
+    houseToggle.classList.toggle('open');
+    houseDetails.classList.toggle('open');
+  });
+}
 
 // ═══════════════════════════════════════════
 // SWIPE GESTURES
