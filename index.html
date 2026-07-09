@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#143A50">
+<title>Morse · OBX 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
+
+<style>
+/* ───────────────────────────────
+   TOKENS
+─────────────────────────────── */
+:root {
+  --sand:         #EFE6D2;
+  --sand-deep:    #E5D8BC;
+  --sand-light:   #F5EFE0;
+  --cream:        #FBF6E8;
+  --paper:        #FFFCF3;
+  --ink:          #0E2A3D;
+  --ink-2:        #2E4759;
+  --ink-3:        #5B6F7E;
+  --ink-4:        #93A1AB;
+  --navy:         #143A50;
+  --navy-deep:    #0B2738;
+  --teal:         #2F6E81;
+  --teal-soft:    #4E8C9E;
+  --gold:         #B8893A;
+  --gold-light:   #D9B86A;
+  --gold-wash:    #F0E2B8;
+  --coral:        #C76B52;
+  --sage:         #8FA391;
+  --rule:         #D4C7A8;
+  --rule-light:   #E5DCC2;
+  --shadow:       0 1px 0 rgba(14,42,61,0.04), 0 8px 24px rgba(14,42,61,0.06);
+  --shadow-card:  0 1px 0 rgba(14,42,61,0.04), 0 2px 8px rgba(14,42,61,0.04);
+  --shadow-fab:   0 6px 20px rgba(14,42,61,0.18), 0 2px 6px rgba(14,42,61,0.10);
+  --serif:        'Fraunces', Georgia, 'Times New Roman', serif;
+  --sans:         'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --radius:       6px;
+  --radius-lg:    10px;
+  --radius-pill:  100px;
+
+  --nav-h: 54px;
+  --strip-h: 36px;
+  --fab-h: 64px;
+}
+
+/* ───────────────────────────────
+   RESET & BASE · iOS-tuned
+─────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  font-size: 15px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  min-height: 100%;
+  min-height: 100dvh;
+}
+body {
+  font-family: var(--sans);
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--sand);
+  background-image:
+    radial-gradient(at 8% 12%, rgba(184,137,58,0.06) 0, transparent 50%),
+    radial-gradient(at 92% 88%, rgba(47,110,129,0.05) 0, transparent 50%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: rgba(184,137,58,0.2);
+  -webkit-touch-callout: none;
+  overscroll-behavior-y: none;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+a, button, select { touch-action: manipulation; -webkit-tap-highlight-color: rgba(184,137,58,0.2); }
+button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+
+/* paper grain */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.38;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' seed='3'/><feColorMatrix values='0 0 0 0 0.4  0 0 0 0 0.32  0 0 0 0 0.2  0 0 0 0.035 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode: multiply;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* ───────────────────────────────
+   TOKEN GATE — hide until validated
+─────────────────────────────── */
+body.locked .nav,
+body.locked .strip,
+body.locked .app { visibility: hidden; }
+
+/* ───────────────────────────────
+   NAV · sticky dropdown
+─────────────────────────────── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--navy);
+  background: linear-gradient(180deg, var(--navy) 0%, var(--navy-deep) 100%);
+  padding-top: env(safe-area-inset-top);
+  border-bottom: 1px solid rgba(217,184,106,0.22);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  height: var(--nav-h);
+  max-width: 1100px;
+  margin: 0 auto;
+  gap: 12px;
+}
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-shrink: 0;
+  min-width: 0;
+}
+.brand-name {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cream);
+  white-space: nowrap;
+}
+.brand-name .dot { color: var(--gold-light); margin: 0 4px; font-style: italic; }
+.brand-badge {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  background: rgba(217,184,106,0.12);
+  border: 1px solid rgba(217,184,106,0.3);
+  padding: 3px 7px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  display: none;
+}
+.brand-badge.live { display: inline-block; }
+
+/* Native select styled as a button */
+.page-picker {
+  position: relative;
+  flex-shrink: 0;
+}
+.page-picker-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(251,246,232,0.08);
+  border: 1px solid rgba(217,184,106,0.28);
+  border-radius: var(--radius);
+  padding: 8px 14px 8px 14px;
+  min-height: 38px;
+  color: var(--cream);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.page-picker-btn .chev {
+  color: var(--gold-light);
+  font-size: 11px;
+  margin-left: 2px;
+}
+.page-picker select {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  font-size: 16px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+}
+
+/* ───────────────────────────────
+   PERSISTENT COUNTDOWN STRIP
+─────────────────────────────── */
+.strip {
+  position: sticky;
+  top: calc(var(--nav-h) + env(safe-area-inset-top));
+  z-index: 40;
+  background: linear-gradient(180deg, var(--cream) 0%, var(--sand-light) 100%);
+  border-bottom: 1px solid var(--rule);
+  height: var(--strip-h);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 11.5px;
+  font-family: var(--sans);
+  color: var(--ink-2);
+  letter-spacing: 0.02em;
+  padding: 0 16px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.strip .sep { color: var(--gold); opacity: 0.6; }
+.strip .lbl {
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.strip .val {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--navy);
+  font-size: 13.5px;
+  font-feature-settings: "tnum";
+}
+.strip .dates {
+  font-family: var(--serif);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* ───────────────────────────────
+   PAGES
+─────────────────────────────── */
+.app {
+  position: relative;
+  z-index: 2;
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
+}
+.page {
+  display: none;
+  animation: pageIn 0.22s ease-out;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px 18px 8px;
+}
+.page.active { display: block; }
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ───────────────────────────────
+   SECTION HEADS / TYPE
+─────────────────────────────── */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 22px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+  flex-wrap: wrap;
+}
+.section-num {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--gold);
+  letter-spacing: 0.06em;
+}
+.section-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 26px;
+  letter-spacing: -0.01em;
+  color: var(--navy);
+  line-height: 1.1;
+}
+.section-sub {
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-left: auto;
+  font-style: italic;
+  text-align: right;
+}
+
+/* ───────────────────────────────
+   TRIP PAGE · hero
+─────────────────────────────── */
+.hero {
+  padding: 16px 0 24px;
+  text-align: center;
+}
+.hero-eyebrow {
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+.hero-eyebrow::before,
+.hero-eyebrow::after {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background: var(--gold);
+  vertical-align: middle;
+  margin: 0 10px;
+  opacity: 0.6;
+}
+.hero-title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(44px, 13vw, 84px);
+  line-height: 0.96;
+  letter-spacing: -0.025em;
+  color: var(--navy);
+  margin-bottom: 8px;
+}
+.hero-title .ital { font-style: italic; font-weight: 300; color: var(--teal); }
+.hero-sub {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(14px, 3.8vw, 17px);
+  color: var(--ink-2);
+  font-weight: 400;
+  max-width: 480px;
+  margin: 6px auto 18px;
+  line-height: 1.4;
+  padding: 0 8px;
+}
+.hero-dates {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  padding: 9px 18px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-pill);
+  background: var(--paper);
+}
+.hero-dates .arrow { color: var(--gold); }
+
+/* Quick facts on trip page */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+.fact-card {
+  background: var(--paper);
+  border: 1px solid var(--rule-light);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+}
+.fact-label {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.fact-body {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.fact-body .pair {
+  display: block;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  margin-top: 2px;
+  color: var(--ink-2);
+}
+.fact-body .small {
+  display: block;
+  font-family: var(--sans);
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+.crew-list { font-family: var(--sans); font-size: 14px; color: var(--ink-2); line-height: 1.65; }
+.crew-list strong { font-family: var(--serif); color: var(--navy); font-weight: 500; }
+
+.car-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--rule-light);
+  font-family: var(--sans);
+  font-size: 13.5px;
+}
+.car-row:last-child { border-bottom: none; padding-bottom: 0; }
+.car-row:first-child { padding-top: 4px; }
+.car-emoji { font-size: 22px; flex-shrink: 0; }
+.car-name {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--navy);
+  font-size: 15px;
+}
+.car-who { color: var(--ink-3); font-size: 12.5px; }
+
+/* ───────────────────────────────
+   CALENDAR PAGE
+─────────────────────────────── */
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+@media (max-width: 380px) {
+  .calendar { grid-template-columns: repeat(2, 1fr); }
+}
+.day {
+  background: var(--paper);
+  border: 1px solid var(--rule-light);
+  border-radius: var(--radius);
+  padding: 12px 12px 12px;
+  position: relative;
+  align-self: start;
+}
+.day-dow {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--teal);
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.day-num {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--navy);
+  margin-top: 2px;
+}
+.day-month {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-top: 3px;
+}
+.day-marker {
+  position: absolute;
+  top: 10px;
+  right: 8px;
+  font-family: var(--sans);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 700;
+  background: var(--gold-wash);
+  padding: 3px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.day-preview { display: none; }
+.day-items {
+  display: block;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule-light);
+}
+.day-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 2px 0;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: var(--ink-2);
+  line-height: 1.35;
+}
+.day-item .e { flex-shrink: 0; font-size: 11px; line-height: 1.4; }
+.day.phase-pretrip { border-color: var(--rule-light); opacity: 0.8; }
+.day.phase-arrival {
+  background: linear-gradient(180deg, var(--paper) 0%, rgba(240,226,184,0.35) 100%);
+  border-color: var(--teal-soft);
+}
+.day.phase-depart {
+  background: linear-gradient(180deg, var(--paper) 0%, rgba(212,199,168,0.28) 100%);
+  border-color: var(--teal-soft);
+}
+.day.past { opacity: 0.45; }
+.day.today {
+  background: linear-gradient(180deg, var(--paper) 0%, var(--gold-wash) 100%);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold), var(--shadow-card);
+}
+.day.today::after {
+  content: 'TODAY';
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 8.5px;
+  letter-spacing: 0.2em;
+  font-weight: 800;
+  color: var(--gold);
+}
+
+/* ───────────────────────────────
+   DRIVE PAGE
+─────────────────────────────── */
+.drive-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+@media (min-width: 720px) {
+  .drive-grid { grid-template-columns: 1fr 1fr; }
+}
+.drive-card {
+  background: var(--paper);
+  border: 1px solid var(--rule-light);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-card);
+}
+.drive-direction {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.drive-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 22px;
+  color: var(--navy);
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+.drive-leg {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--rule-light);
+  font-size: 13px;
+}
+.drive-leg:last-child { border-bottom: none; }
+.drive-when {
+  font-family: var(--sans);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal);
+}
+.drive-what { color: var(--ink-2); }
+.drive-what strong { font-family: var(--serif); color: var(--navy); font-weight: 500; }
+.stop-options {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule-light);
+}
+.stop-options-title {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.stop-options ul { list-style: none; }
+.stop-options li {
+  padding: 5px 0;
+  font-family: var(--serif);
+  font-size: 14.5px;
+  color: var(--ink);
+}
+.stop-options li .desc {
+  font-family: var(--sans);
+  font-style: normal;
+  font-size: 12px;
+  color: var(--ink-3);
+  display: block;
+}
+.route-sketch {
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule-light);
+  line-height: 1.7;
+  font-style: italic;
+}
+
+/* ───────────────────────────────
+   HOUSE PAGE
+─────────────────────────────── */
+.house-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+@media (min-width: 720px) {
+  .house-grid { grid-template-columns: 1.2fr 1fr; }
+}
+.house-main {
+  background: var(--paper);
+  border: 1px solid var(--rule-light);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-card);
+}
+.house-name {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 26px;
+  color: var(--navy);
+  line-height: 1.1;
+}
+.house-name .formerly {
+  font-style: italic;
+  font-size: 13px;
+  color: var(--ink-3);
+  font-weight: 400;
+  display: block;
+  margin-top: 4px;
+}
+.house-addr {
+  font-family: var(--sans);
+  font-size: 13.5px;
+  color: var(--ink-2);
+  margin: 14px 0;
+  padding: 12px 14px;
+  background: var(--sand-light);
+  border-radius: var(--radius);
+  border-left: 3px solid var(--gold);
+  display: block;
+  min-height: 44px;
+}
+.house-addr a {
+  color: var(--teal);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgba(47,110,129,0.3);
+  text-underline-offset: 3px;
+}
+.house-addr .small { display: block; font-size: 11.5px; color: var(--ink-3); margin-top: 2px; font-style: italic; }
+
+.layout-row {
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--rule-light);
+  font-size: 13px;
+}
+.layout-row:last-child { border-bottom: none; }
+.layout-floor {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--navy);
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+.layout-detail { color: var(--ink-2); font-size: 12.5px; line-height: 1.5; }
+
+.amenities {
+  background: var(--cream);
+  border: 1px solid var(--rule-light);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-card);
+}
+.amen-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--navy);
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+.amen-list { list-style: none; }
+.amen-list li {
+  font-size: 13px;
+  color: var(--ink-2);
+  padding: 5px 0;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.amen-list li::before {
+  content: '✦';
+  color: var(--gold);
+  font-size: 9px;
+  flex-shrink: 0;
+}
+.dont-forget {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule-light);
+}
+.dont-forget-title {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--coral);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.df-item {
+  font-size: 12px;
+  color: var(--ink-2);
+  padding: 4px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.df-item .val { color: var(--ink-3); font-style: italic; }
+
+/* ───────────────────────────────
+   IDEAS PAGE
+─────────────────────────────── */
+.tag-key {
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: var(--cream);
+  border-radius: var(--radius);
+  border: 1px solid var(--rule-light);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+}
+.tag-key strong {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--navy);
+  font-size: 12.5px;
+}
+.tag-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  color: var(--ink-2);
+}
+
+/* Sub-tab filter */
+.subtabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 4px 0 12px;
+  margin-bottom: 8px;
+}
+.subtabs::-webkit-scrollbar { display: none; }
+.subtab {
+  flex-shrink: 0;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  background: var(--paper);
+  border: 1px solid var(--rule-light);
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+}
+.subtab:active { background: var(--sand-light); }
+.subtab.on {
+  background: var(--navy);
+  color: var(--cream);
+  border-color: var(--navy);
+}
+
+.cat { margin-bottom: 28px; }
+.cat.hidden { display: none; }
+.cat-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 19px;
+  color: var(--navy);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.cat-title .num {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 11.5px;
+  color: var(--gold);
+  font-weight: 400;
+}
+.cat-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+@media (min-width: 540px) {
+  .cat-list { grid-template-columns: repeat(2, 1fr); }
+}
+.act {
+  background: var(--paper);
+  border: 1px solid var(--rule-light);
+  border-radius: var(--radius);
+  padding: 13px 15px;
+  box-shadow: var(--shadow-card);
+}
+.act-name {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--navy);
+  line-height: 1.25;
+  margin-bottom: 4px;
+}
+.act-desc {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+.act-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.tag {
+  font-size: 10.5px;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: var(--sand-light);
+  padding: 3px 7px;
+  border-radius: 3px;
+}
+.tag.book { background: var(--gold-wash); color: var(--gold); }
+.act .note {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--ink-3);
+  margin-top: 6px;
+  display: block;
+}
+
+/* Groupings */
+.groupings {
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
+}
+.groupings-head {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.groupings-eyebrow {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.groupings-title {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 24px;
+  color: var(--navy);
+  font-style: italic;
+}
+.groupings-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 540px) {
+  .groupings-list { grid-template-columns: repeat(2, 1fr); }
+}
+.group {
+  background: linear-gradient(180deg, var(--cream) 0%, var(--paper) 100%);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  position: relative;
+}
+.group::before {
+  content: '';
+  position: absolute;
+  top: 18px;
+  left: 0;
+  width: 3px;
+  height: 28px;
+  background: var(--gold);
+  border-radius: 0 2px 2px 0;
+}
+.group-name {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--navy);
+  margin-bottom: 6px;
+  line-height: 1.25;
+}
+.group-name .emoji { margin-right: 6px; }
+.group-flow {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+.group-flow .arrow { color: var(--gold); margin: 0 3px; }
+.group-tag {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--teal);
+  font-weight: 700;
+}
+
+/* ───────────────────────────────
+   EAT & BOOK PAGE
+─────────────────────────────── */
+.book-ahead {
+  background: linear-gradient(135deg, var(--gold-wash) 0%, var(--cream) 100%);
+  border: 1px solid var(--gold-light);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 28px;
+}
+.book-ahead-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+.book-ahead-sub {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-3);
+  margin-bottom: 14px;
+}
+.book-list { list-style: none; }
+.book-item {
+  padding: 11px 0;
+  border-bottom: 1px dashed rgba(184,137,58,0.25);
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+.book-item:last-child { border-bottom: none; padding-bottom: 0; }
+.book-num {
+  font-family: var(--serif);
+  font-style: italic;
+  color: var(--gold);
+  font-size: 15px;
+  font-weight: 500;
+}
+.book-what {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 14.5px;
+  color: var(--navy);
+  line-height: 1.3;
+}
+.book-why {
+  font-size: 12px;
+  color: var(--ink-2);
+  margin-top: 2px;
+  display: block;
+  font-family: var(--sans);
+}
+
+.eat-section-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--navy);
+  margin-bottom: 14px;
+}
+.eat-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+@media (min-width: 540px) {
+  .eat-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.eat-cat {
+  background: var(--paper);
+  border: 1px solid var(--rule-light);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-card);
+}
+.eat-cat-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--navy);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.eat-list { list-style: none; }
+.eat-list li {
+  padding: 7px 0;
+  border-bottom: 1px dashed var(--rule-light);
+  font-size: 13px;
+  color: var(--ink-2);
+  line-height: 1.4;
+}
+.eat-list li:last-child { border-bottom: none; }
+.eat-list li strong {
+  font-family: var(--serif);
+  font-weight: 500;
+  color: var(--navy);
+  font-size: 14px;
+}
+.eat-list .desc {
+  display: block;
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-top: 2px;
+}
+
+/* ───────────────────────────────
+   REFERENCE PAGE
+─────────────────────────────── */
+.ref-stack {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+@media (min-width: 720px) {
+  .ref-stack.two { grid-template-columns: 1fr 1fr; }
+}
+.ref-card {
+  background: var(--paper);
+  border: 1px solid var(--rule-light);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-card);
+}
+.ref-title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--navy);
+  margin-bottom: 12px;
+}
+.ref-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 7px 0;
+  border-bottom: 1px dashed var(--rule-light);
+  font-size: 13px;
+  gap: 12px;
+}
+.ref-row:last-child { border-bottom: none; }
+.ref-key {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.ref-val {
+  font-family: var(--sans);
+  color: var(--navy);
+  font-size: 12.5px;
+  text-align: right;
+}
+.ref-note {
+  margin-top: 12px;
+  font-size: 11.5px;
+  font-style: italic;
+  color: var(--ink-3);
+  line-height: 1.5;
+}
+.rainy-list { list-style: none; }
+.rainy-list li {
+  padding: 9px 0;
+  border-bottom: 1px dashed var(--rule-light);
+  font-size: 13px;
+  color: var(--ink-2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rainy-list li:last-child { border-bottom: none; }
+.rainy-list .icon { font-size: 16px; flex-shrink: 0; }
+
+/* Phone list */
+.phone-list { padding: 4px 22px; }
+.phone-row {
+  padding: 13px 0;
+  border-bottom: 1px solid var(--rule-light);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 44px;
+}
+.phone-row:last-child { border-bottom: none; }
+.phone-label {
+  font-family: var(--serif);
+  font-weight: 500;
+  color: var(--navy);
+  font-size: 14px;
+}
+.phone-label .sub {
+  display: block;
+  font-family: var(--sans);
+  font-size: 11.5px;
+  color: var(--ink-3);
+  font-weight: 400;
+  margin-top: 2px;
+  font-style: italic;
+}
+.phone-num {
+  font-family: var(--sans);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--teal);
+  padding: 8px 12px;
+  background: var(--sand-light);
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+  font-feature-settings: "tnum";
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+}
+.phone-num.tbd { color: var(--ink-4); font-style: italic; font-weight: 500; }
+
+/* Checklist */
+.checklist {
+  background: var(--paper);
+  border: 1px solid var(--rule-light);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-card);
+}
+.ck-row {
+  padding: 11px 0;
+  border-bottom: 1px dashed var(--rule-light);
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 14px;
+  align-items: baseline;
+}
+.ck-row:last-child { border-bottom: none; }
+.ck-when {
+  font-family: var(--sans);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 800;
+}
+.ck-items {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  color: var(--ink);
+  line-height: 1.5;
+}
+.ck-items .sep { color: var(--gold); margin: 0 6px; opacity: 0.5; }
+
+.sub-head {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--navy);
+  margin: 24px 0 12px;
+}
+
+/* ───────────────────────────────
+   FOOTER (inside pages)
+─────────────────────────────── */
+.page-foot {
+  text-align: center;
+  padding: 24px 0 8px;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--ink-4);
+}
+</style>
+</head>
+<body class="locked">
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="brand">
+      <span class="brand-name">Morse <span class="dot">·</span> OBX 2026</span>
+      <span class="brand-badge" id="brand-badge"></span>
+    </div>
+    <div class="page-picker">
+      <div class="page-picker-btn">
+        <span id="picker-label">Trip</span>
+        <span class="chev">▾</span>
+      </div>
+      <select id="page-select" aria-label="Select page">
+        <option value="trip">Trip</option>
+        <option value="calendar">Calendar</option>
+        <option value="ideas">Ideas</option>
+        <option value="eat">Eat &amp; Book</option>
+        <option value="reference">Reference</option>
+      </select>
+    </div>
+  </div>
+</nav>
+
+<!-- COUNTDOWN STRIP -->
+<div class="strip">
+  <span class="lbl">Until check-in</span>
+  <span class="val" id="strip-cd">--</span>
+  <span class="sep">·</span>
+  <span class="dates">Jul 12 → Jul 26, 2026</span>
+</div>
+
+<main class="app" id="app">
+
+  <!-- ═══════════ TRIP PAGE ═══════════ -->
+  <section class="page active" id="page-trip" data-page="trip">
+    <div class="hero">
+      <div class="hero-eyebrow">Outer Banks · North Carolina</div>
+      <h1 class="hero-title">Morse <span class="ital">at the sea</span></h1>
+      <p class="hero-sub">Fourteen unhurried nights on Windance Lane — sand between the toes, donuts in the morning, lighthouse on the horizon.</p>
+      <div class="hero-dates">Sun Jul 12 <span class="arrow">→</span> Sun Jul 26 · 2026</div>
+    </div>
+
+    <div class="section-head">
+      <span class="section-num">i.</span>
+      <h2 class="section-title">The Particulars</h2>
+    </div>
+    <div class="facts">
+      <div class="fact-card">
+        <div class="fact-label">The Crew · 8</div>
+        <div class="crew-list" style="font-family: var(--serif); font-size: 18px; color: var(--navy); line-height: 1.7; letter-spacing: 0.04em;">
+          M · C · R · S · Z · J · G · T
+        </div>
+        <div style="font-family: var(--serif); font-style: italic; font-size: 13px; color: var(--ink-3); margin-top: 8px;">All together for two weeks</div>
+      </div>
+      <div class="fact-card">
+        <div class="fact-label">The Stay</div>
+        <div class="fact-body">
+          Dear Summer
+          <span class="pair">5 bed · 4.5 bath · sleeps 10</span>
+          <span class="small">Pool · hot tub · game room · ~500 yds to beach</span>
+        </div>
+      </div>
+      <div class="fact-card">
+        <div class="fact-label">Check-in / Out</div>
+        <div class="fact-body">
+          Sun Jul 12 · 5:00 PM
+          <span class="pair">Sun Jul 26 · 10:00 AM</span>
+          <span class="small">14 nights</span>
+        </div>
+      </div>
+      <div class="fact-card">
+        <div class="fact-label">The Convoy</div>
+        <div class="car-row"><span class="car-emoji">🚙</span><div><div class="car-name">Magic Vaycay Truck</div><div class="car-who">J &amp; G · R, S, Z</div></div></div>
+        <div class="car-row"><span class="car-emoji">🚗</span><div><div class="car-name">Pushing 40</div><div class="car-who">M, C &amp; T</div></div></div>
+      </div>
+    </div>
+
+    <div class="section-head" style="margin-top:28px;">
+      <span class="section-num">ii.</span>
+      <h2 class="section-title">Heading South</h2>
+      <span class="section-sub">Sat Jul 11 → Sun Jul 12</span>
+    </div>
+    <div class="drive-grid">
+      <div class="drive-card">
+        <div class="drive-direction">Down · Sat Jul 11 → Sun Jul 12</div>
+        <div class="drive-title">Heading South, via DC</div>
+        <div class="drive-leg"><div class="drive-when">Sat 4 AM</div><div class="drive-what">Leave <strong>Plainfield</strong></div></div>
+        <div class="drive-leg"><div class="drive-when">Sat ~3 PM</div><div class="drive-what">Arrive <strong>Hampton Inn &amp; Suites Falls Church</strong> · check-in 3 PM</div></div>
+        <div class="drive-leg"><div class="drive-when">Sun AM</div><div class="drive-what">Into DC · <strong>Lincoln Memorial</strong> + <strong>Washington Monument</strong> · checkout noon</div></div>
+        <div class="drive-leg"><div class="drive-when">Sun midday</div><div class="drive-what">Back on the road · ~5 hr to Corolla</div></div>
+        <div class="drive-leg"><div class="drive-when">Sun ~5 PM</div><div class="drive-what">Arrive <strong>Corolla</strong> · right at check-in</div></div>
+        <div class="stop-options">
+          <div class="stop-options-title">Overnight stop</div>
+          <ul>
+            <li><a href="https://maps.apple.com/?q=6430+Arlington+Blvd,+Falls+Church,+VA+22042">Hampton Inn &amp; Suites Falls Church</a><span class="desc">6430 Arlington Blvd, Falls Church, VA 22042 · 1 night, 3 rooms</span></li>
+            <li>Room: 2 Queens, microwave &amp; fridge, non-smoking<span class="desc">Confirmation #81892378 · 2 more confirmations TBD</span></li>
+          </ul>
+        </div>
+        <div class="route-sketch">Route sketch: I-80 E → I-76 E (PA Turnpike) → I-70 E → I-270 S → I-495 S into Falls Church. Sunday: I-66/Memorial Bridge into DC, then I-395 S → I-95 S → I-64 E → US-168 S → US-158 → NC-12 N to Corolla. Run live nav — DC weekend traffic varies.</div>
+      </div>
+    </div>
+
+    <div class="section-head" style="margin-top:28px;">
+      <span class="section-num">iii.</span>
+      <h2 class="section-title">Dear Summer</h2>
+      <span class="section-sub">three levels, room for all</span>
+    </div>
+    <div class="house-grid">
+      <div class="house-main">
+        <div class="house-name">Dear Summer<span class="formerly">formerly Victorian Fan Ta Sea · once featured on TLC's Jon &amp; Kate Plus 8</span></div>
+        <a class="house-addr" href="https://maps.apple.com/?q=1249+Windjammer+Court,+Corolla,+NC+27927">
+          1249 Windjammer Court, Corolla, NC 27927
+          <span class="small">Tap to open in Maps</span>
+        </a>
+        <div class="layout-row"><div class="layout-floor">Top Level</div><div class="layout-detail">Living · kitchen · dining · den w/ sleeper sofa · ½ bath · Master King + bath · sun deck · gazebo</div></div>
+        <div class="layout-row"><div class="layout-floor">Mid Level</div><div class="layout-detail">Additional bedrooms · exact bed config TBD from rental docs</div></div>
+        <div class="layout-row"><div class="layout-floor">Ground Level</div><div class="layout-detail">Game room (pool · ping pong · foosball) · wet bar + beverage fridge · ½ bath · laundry · outdoor shower · pool access</div></div>
+      </div>
+      <div class="amenities">
+        <div class="amen-title">Amenities</div>
+        <ul class="amen-list">
+          <li>Private 16'×32' saltwater pool</li>
+          <li>Hot tub</li>
+          <li>Charcoal grill (new for 2026)</li>
+          <li>Bicycles &amp; beach chairs for guest use</li>
+          <li>Mini-fridge &amp; cabinet on the porch</li>
+          <li>Outdoor shower</li>
+          <li>Two single-car carports</li>
+          <li>Community pool, tennis, playground</li>
+          <li>Linens &amp; towels included</li>
+          <li>Dogs welcome</li>
+          <li>Keyless entry (code activates at 5 PM)</li>
+          <li>$35/night beach gear rental credit</li>
+        </ul>
+        <div class="dont-forget">
+          <div class="dont-forget-title">Don't Forget</div>
+          <div class="df-item"><span>Wi-Fi</span><span class="val">MySpectrumWiFiC6 · studioduty112</span></div>
+          <div class="df-item"><span>Router</span><span class="val">TL living room, near TV</span></div>
+          <div class="df-item"><span>Entry code</span><span class="val">174216 → press bottom-left button · active 5 PM</span></div>
+          <div class="df-item"><span>Checkout code</span><span class="val">123456* → auto-notifies Seaside</span></div>
+          <div class="df-item"><span>Beds</span><span class="val">linens on beds, not made — you make them</span></div>
+          <div class="df-item"><span>Hot tub</span><span class="val">under 16 not permitted · shower before &amp; after</span></div>
+          <div class="df-item"><span>Pool tech</span><span class="val">mid-week service visit during stay</span></div>
+          <div class="df-item"><span>Trash</span><span class="val">black &amp; brown cans · to street night before pickup</span></div>
+          <div class="df-item"><span>Parking</span><span class="val">driveway/carport · no overnight in community lots</span></div>
+          <div class="df-item"><span>Pets</span><span class="val">welcome · not in pool or hot tub</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ref-card" style="margin-top:14px;">
+      <div class="ref-title">Pack This</div>
+      <div class="ref-row"><span class="ref-key">Starter kit provided</span><span class="ref-val">2 TP rolls · paper towel · liner · sponge · dishwasher packet</span></div>
+      <div class="ref-row"><span class="ref-key">Bathrooms</span><span class="ref-val">Hand soap · shampoo &amp; toiletries · extra TP</span></div>
+      <div class="ref-row"><span class="ref-key">Kitchen</span><span class="ref-val">Coffee + filters · condiments · spices · foil · ziploc · garbage bags · dish soap</span></div>
+      <div class="ref-row"><span class="ref-key">General</span><span class="ref-val">Laundry detergent · all-purpose cleaner · first aid kit · chargers</span></div>
+    </div>
+
+    <div class="section-head" style="margin-top:28px;">
+      <span class="section-num">iv.</span>
+      <h2 class="section-title">Heading Home</h2>
+      <span class="section-sub">Sun Jul 26 · straight through</span>
+    </div>
+    <div class="drive-grid">
+      <div class="drive-card">
+        <div class="drive-direction">Back · Sun Jul 26 · straight through</div>
+        <div class="drive-title">Heading Home</div>
+        <div class="drive-leg"><div class="drive-when">Sun 10 AM</div><div class="drive-what">Check out · last beach pic on the way out</div></div>
+        <div class="drive-leg"><div class="drive-when">Sun ~10:15 AM</div><div class="drive-what">Wheels rolling · no overnight this time, one straight push</div></div>
+        <div class="drive-leg"><div class="drive-when">Sun late night</div><div class="drive-what">Home to <strong>Plainfield</strong> · ~16 hr drive, swap drivers along the way</div></div>
+        <div class="route-sketch">Route sketch: NC-12 S → US-158 → US-168 N → I-64 W → I-81 N → I-70/68 W → I-76 W (PA Turnpike) → I-80 W to Plainfield. No DC detour on the way home. Long single day — plan for stops and driver swaps.</div>
+      </div>
+    </div>
+
+    <div class="page-foot">↔ swipe between pages · or use the dropdown above</div>
+  </section>
+
+  <!-- ═══════════ CALENDAR PAGE ═══════════ -->
+  <section class="page" id="page-calendar" data-page="calendar">
+    <div class="section-head">
+      <span class="section-num">ii.</span>
+      <h2 class="section-title">The Full Trip</h2>
+      <span class="section-sub">Jul 11 → Jul 26</span>
+    </div>
+    <div class="calendar" id="calendar-grid"></div>
+    <div class="page-foot">Jul 11 departure through Jul 26 checkout</div>
+  </section>
+
+  <!-- ═══════════ IDEAS PAGE ═══════════ -->
+  <section class="page" id="page-ideas" data-page="ideas">
+    <div class="section-head">
+      <span class="section-num">iii.</span>
+      <h2 class="section-title">Ideas, Not Plans</h2>
+      <span class="section-sub">pick by mood, not by date</span>
+    </div>
+    <div class="tag-key">
+      <strong>Tag key:</strong>
+      <span class="tag-item">🛋️ Low</span>
+      <span class="tag-item">🚶 Walk</span>
+      <span class="tag-item">🚗 Day trip</span>
+      <span class="tag-item">🌊 Water</span>
+      <span class="tag-item">👴 GP</span>
+      <span class="tag-item">🎢 Kid</span>
+    </div>
+    <div class="subtabs" id="subtabs">
+      <button class="subtab on" data-filter="all">All</button>
+      <button class="subtab" data-filter="lighthouses">Lighthouses</button>
+      <button class="subtab" data-filter="horses">Horses</button>
+      <button class="subtab" data-filter="cultural">Cultural</button>
+      <button class="subtab" data-filter="outdoors">Outdoors</button>
+      <button class="subtab" data-filter="water">Water</button>
+      <button class="subtab" data-filter="kids">Kids</button>
+    </div>
+
+    <div class="cat" data-cat="lighthouses">
+      <h3 class="cat-title">Lighthouses <span class="num">— the must-do thread</span></h3>
+      <div class="cat-list">
+        <div class="act"><div class="act-name">Currituck Beach Lighthouse ✅</div><div class="act-desc">3 min · 1 mi · 220 steps · open for climbing · grandparents can walk the grounds.</div><div class="act-tags"><span class="tag">🚶 Walk</span><span class="tag">👴 GP</span><span class="tag">🎢 Kid</span></div></div>
+        <div class="act"><div class="act-name">Bodie Island Lighthouse ✅</div><div class="act-desc">~1.5 hr south · 219 steps · open for climbing Apr–Oct · tickets via recreation.gov day-of at 7 AM · kids must be 42"+.</div><div class="act-tags"><span class="tag">🚗 Day trip</span><span class="tag">🚶 Walk</span></div></div>
+        <div class="act"><div class="act-name">Cape Hatteras Lighthouse 🚧</div><div class="act-desc">2 hr 5 min · 85 mi · tallest brick lighthouse in the US · grounds open · no climbing in 2026 — restoration ongoing through end of year.</div><div class="act-tags"><span class="tag">🚗 Day trip</span><span class="tag">👴 GP</span></div></div>
+      </div>
+    </div>
+
+    <div class="cat" data-cat="horses">
+      <h3 class="cat-title">Wild Horses <span class="num">— the OBX classic</span></h3>
+      <div class="cat-list">
+        <div class="act"><div class="act-name">Wild Horse Museum</div><div class="act-desc">Walkable from Historic Corolla · indoor · AC · small &amp; easy.</div><div class="act-tags"><span class="tag">🛋️ Low</span><span class="tag">👴 GP</span></div></div>
+        <div class="act"><div class="act-name">Wild Horse 4×4 Tour</div><div class="act-desc">2-hr open-air ride up the beach · grandparents sit, don't walk · maybe for this trip.</div><div class="act-tags"><span class="tag">👴 GP</span><span class="tag">🎢 Kid</span></div></div>
+        <div class="act"><div class="act-name">Currituck Banks Reserve</div><div class="act-desc">Short trails just north · sometimes spot wild horses, always quiet.</div><div class="act-tags"><span class="tag">🚶 Walk</span></div></div>
+      </div>
+    </div>
+
+    <div class="cat" data-cat="cultural">
+      <h3 class="cat-title">Cultural &amp; Easy <span class="num">— low-effort, high-payoff</span></h3>
+      <div class="cat-list">
+        <div class="act"><div class="act-name">Whalehead Club</div><div class="act-desc">1920s mansion tour in Historic Corolla Park · drive right up.</div><div class="act-tags"><span class="tag">👴 GP</span><span class="tag">🛋️ Low</span></div></div>
+        <div class="act"><div class="act-name">Sanctuary Vineyards</div><div class="act-desc">Local OBX winery · Jarvisburg · ~40 min south · tastings, vineyard views.</div><div class="act-tags"><span class="tag">🚗 Day trip</span><span class="tag">🛋️ Low</span></div></div>
+        <div class="act"><div class="act-name">OBX Wildlife Education Center</div><div class="act-desc">Free · indoor · exhibits · perfect rainy-day fallback.</div><div class="act-tags"><span class="tag">👴 GP</span><span class="tag">🛋️ Low</span><span class="tag">🎢 Kid</span></div></div>
+        <div class="act"><div class="act-name">Wright Brothers Memorial</div><div class="act-desc">Kill Devil Hills · 50 min · 28 mi · monument + museum.</div><div class="act-tags"><span class="tag">🚗 Day trip</span><span class="tag">👴 GP</span></div></div>
+      </div>
+    </div>
+
+    <div class="cat" data-cat="outdoors">
+      <h3 class="cat-title">Outdoors &amp; Iconic <span class="num">— photo spots</span></h3>
+      <div class="cat-list">
+        <div class="act"><div class="act-name">Jockey's Ridge State Park</div><div class="act-desc">Massive sand dunes · best at sunset · 58 min · 32 mi.</div><div class="act-tags"><span class="tag">🚗 Day trip</span><span class="tag">🎢 Kid</span></div></div>
+        <div class="act"><div class="act-name">Duck Town Boardwalk</div><div class="act-desc">Sound-side stroll · shops · ice cream · ~30 min south.</div><div class="act-tags"><span class="tag">🚶 Walk</span><span class="tag">👴 GP</span></div></div>
+        <div class="act"><div class="act-name">Roanoke Island / Manteo</div><div class="act-desc">~1.5 hr south · Elizabethan Gardens · Roanoke Marshes Lighthouse · historic downtown waterfront.</div><div class="act-tags"><span class="tag">🚗 Day trip</span><span class="tag">👴 GP</span></div></div>
+      </div>
+    </div>
+
+    <div class="cat" data-cat="water">
+      <h3 class="cat-title">Beach &amp; Water <span class="num">— the daily default</span></h3>
+      <div class="cat-list">
+        <div class="act"><div class="act-name">Ocean Hill Beach Access</div><div class="act-desc">Closest access · ~3 min walk · daily ritual.</div><div class="act-tags"><span class="tag">🌊 Water</span><span class="tag">🎢 Kid</span></div></div>
+        <div class="act"><div class="act-name">Shelling</div><div class="act-desc">Go early at low tide · look for whelks, sand dollars, Scotch Bonnets, sea glass · the uncrowded northern beaches near the house are great for kids.</div><span class="note">South Beach near Cape Point (Buxton, ~2 hrs south) is the legendary OBX shelling spot if you want the full haul.</span><div class="act-tags"><span class="tag">🌊 Water</span><span class="tag">🎢 Kid</span><span class="tag">👴 GP</span></div></div>
+        <div class="act"><div class="act-name">Kayak / SUP on the Sound</div><div class="act-desc">Calm flat water · kid-friendly · sunset paddles.</div><div class="act-tags"><span class="tag">🌊 Water</span><span class="tag">🎢 Kid</span></div></div>
+      </div>
+    </div>
+
+    <div class="cat" data-cat="kids">
+      <h3 class="cat-title">Kid Faves <span class="num">— good for everyone, kids love it</span></h3>
+      <div class="cat-list">
+        <div class="act"><div class="act-name">Corolla Adventure Park</div><div class="act-desc">Zip lines · obstacle courses · we're going.</div><div class="act-tags"><span class="tag">🎢 Kid</span></div></div>
+        <div class="act"><div class="act-name">Corolla Adventure Golf &amp; Bumper Cars</div><div class="act-desc">Mini golf · bumper cars · GPs watch from shade.</div><div class="act-tags"><span class="tag">🎢 Kid</span><span class="tag">👴 GP</span></div></div>
+
+      </div>
+    </div>
+
+    <div class="groupings">
+      <div class="groupings-head">
+        <div class="groupings-eyebrow">If you want to combine</div>
+        <div class="groupings-title">Suggested Pairings</div>
+      </div>
+      <div class="groupings-list">
+        <div class="group"><div class="group-name"><span class="emoji">🥯</span>Corolla Local Morning</div><div class="group-flow">Currituck Lighthouse <span class="arrow">→</span> Wild Horse Museum <span class="arrow">→</span> Duck Donuts</div><div class="group-tag">Half-day · all within a mile</div></div>
+        <div class="group"><div class="group-name"><span class="emoji">🚗</span>Roanoke Day</div><div class="group-flow">Manteo lunch <span class="arrow">→</span> Elizabethan Gardens <span class="arrow">→</span> Roanoke Marshes Lighthouse</div><div class="group-tag">Full day · ~1.5 hr each way</div></div>
+        <div class="group"><div class="group-name"><span class="emoji">🌅</span>Nags Head Sunset Run</div><div class="group-flow">Wright Brothers <span class="arrow">→</span> Jockey's Ridge for sunset <span class="arrow">→</span> dinner on the way back</div><div class="group-tag">Late afternoon · photo gold</div></div>
+        <div class="group"><div class="group-name"><span class="emoji">🛋️</span>Easy Day</div><div class="group-flow">Whalehead Club <span class="arrow">→</span> Wildlife Education Center <span class="arrow">→</span> ice cream walk</div><div class="group-tag">All in Corolla · low-mileage</div></div>
+        <div class="group"><div class="group-name"><span class="emoji">🏖️</span>Stay-In Day</div><div class="group-flow">Beach AM <span class="arrow">→</span> pool PM <span class="arrow">→</span> takeout <span class="arrow">→</span> game room tournament</div><div class="group-tag">Do this 3+ times · trust us</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ EAT & BOOK PAGE ═══════════ -->
+  <section class="page" id="page-eat" data-page="eat">
+    <div class="section-head">
+      <span class="section-num">iv.</span>
+      <h2 class="section-title">Eat &amp; Book</h2>
+      <span class="section-sub">donuts, takeout, groceries</span>
+    </div>
+
+    <div class="eat-section-title">Donuts, Takeout &amp; Groceries</div>
+    <div class="eat-grid">
+      <div class="eat-cat">
+        <div class="eat-cat-title">🥯 Donuts</div>
+        <ul class="eat-list">
+          <li><strong>Duck Donuts</strong><span class="desc">Corolla · made-to-order · the OBX staple</span></li>
+          <li><strong>Orange Blossom Bakery</strong><span class="desc">Buxton · ~2 hr south · famous Big Uglies · get there early, they sell out</span></li>
+          <li><strong>Donuts4You</strong><span class="desc">Kitty Hawk · ~45 min south · locals rave · order ahead online</span></li>
+          <li><strong>Big Buck's</strong><span class="desc">Homemade donuts &amp; ice cream</span></li>
+        </ul>
+      </div>
+      <div class="eat-cat">
+        <div class="eat-cat-title">🍕 Takeout in Corolla</div>
+        <ul class="eat-list">
+          <li><strong>Corolla Pizza &amp; Deli</strong><span class="desc">Pizza · subs · easy family order</span></li>
+          <li><strong>Cosmo's Pizzeria</strong><span class="desc">Well-reviewed slices</span></li>
+          <li><strong>Uncle Ike's Sandbar &amp; Grill</strong><span class="desc">Casual · takeout-friendly</span></li>
+        </ul>
+      </div>
+      <div class="eat-cat">
+        <div class="eat-cat-title">🦐 Seafood for the Kitchen</div>
+        <ul class="eat-list">
+          <li><strong>Local seafood market</strong><span class="desc">Pick up fresh catch · grill at the house · names TBD</span></li>
+        </ul>
+      </div>
+      <div class="eat-cat">
+        <div class="eat-cat-title">🛒 Groceries</div>
+        <ul class="eat-list">
+          <li><strong>Food Lion Corolla</strong><span class="desc">Closest grocery · 10 min · 4.4 mi</span></li>
+          <li><strong>Walmart</strong><span class="desc">Big-shop run · 42 min · 22 mi</span></li>
+          <li><strong>Pre-arrival delivery</strong><span class="desc">Order ahead · time it for Sun Jul 12</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ REFERENCE PAGE ═══════════ -->
+  <section class="page" id="page-reference" data-page="reference">
+    <div class="section-head">
+      <span class="section-num">v.</span>
+      <h2 class="section-title">Reference</h2>
+      <span class="section-sub">beach · rainy · phone · cadence</span>
+    </div>
+
+    <div class="ref-stack two">
+      <div class="ref-card">
+        <div class="ref-title">Beach Reference</div>
+        <div class="ref-row"><span class="ref-key">Sunrise (range)</span><span class="ref-val">~5:55 – 6:10 AM</span></div>
+        <div class="ref-row"><span class="ref-key">Sunset (range)</span><span class="ref-val">~8:15 – 8:30 PM</span></div>
+        <div class="ref-row"><span class="ref-key">Tides</span><span class="ref-val">check Currituck Beach chart</span></div>
+        <div class="ref-row"><span class="ref-key">Beach gear</span><span class="ref-val">$35/night credit</span></div>
+        <div class="ref-row"><span class="ref-key">4×4 to north horses</span><span class="ref-val">skip · needs 4WD + permit</span></div>
+        <p class="ref-note">Update the week before the trip — sunrise/sunset shift slightly across the 14 nights, and the tide chart is the actually useful bit.</p>
+        <p class="ref-note" style="margin-top:8px;color:var(--coral);">⚠️ Beach nourishment planned this summer in Nags Head, Avon &amp; Buxton — Corolla not affected. Check DareNC.com before any day trip south.</p>
+      </div>
+      <div class="ref-card">
+        <div class="ref-title">Rainy Day Ideas</div>
+        <ul class="rainy-list">
+          <li><span class="icon">🎱</span><span>Game room tournament — pool, ping pong, foosball</span></li>
+          <li><span class="icon">🏛️</span><span>Whalehead Club mansion tour</span></li>
+          <li><span class="icon">🦅</span><span>OBX Wildlife Education Center (free, indoor)</span></li>
+          <li><span class="icon">🍿</span><span>Movie night + Duck Donuts run</span></li>
+          <li><span class="icon">🛍️</span><span>Tanger Outlets in Nags Head (~1 hr)</span></li>
+          <li><span class="icon">✈️</span><span>Wright Brothers Memorial (mostly indoor museum)</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sub-head">Numbers &amp; Logistics — tap to call</div>
+    <div class="ref-card phone-list">
+      <div class="phone-row"><div class="phone-label">Seaside Vacations<span class="sub">Property manager</span></div><a class="phone-num" href="tel:+12522615500">252-261-5500</a></div>
+      <div class="phone-row"><div class="phone-label">Seaside Vacations<span class="sub">Toll-free</span></div><a class="phone-num" href="tel:+18003952525">800-395-2525</a></div>
+      <div class="phone-row"><div class="phone-label">Seaside Vacations Email<span class="sub">rentals@seasideobx.com</span></div><a class="phone-num" href="mailto:rentals@seasideobx.com">Email</a></div>
+      <div class="phone-row"><div class="phone-label">Outer Banks Hospital<span class="sub">Nags Head · ~1 hr south</span></div><span class="phone-num tbd">TBD</span></div>
+      <div class="phone-row"><div class="phone-label">Nearest Urgent Care<span class="sub">verify closest to Corolla</span></div><span class="phone-num tbd">TBD</span></div>
+      <div class="phone-row"><div class="phone-label">CVS / Pharmacy<span class="sub">Corolla area</span></div><span class="phone-num tbd">TBD</span></div>
+      <div class="phone-row"><div class="phone-label">Wild Horse Tour Operator<span class="sub">once booked</span></div><span class="phone-num tbd">TBD</span></div>
+      <div class="phone-row"><div class="phone-label">Food Lion Corolla<span class="sub">closest grocery</span></div><span class="phone-num tbd">TBD</span></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FAB removed in v11 -->
+
+<script>
+// ═══════════════════════════════════════════
+// TOKEN GATE
+// SHA-256 hash of the access token.
+// Token never lives in source — only in the bookmark URL (?k=TOKEN).
+// To regenerate: node -e "const c=require('crypto'); const t=c.randomBytes(24).toString('hex'); console.log('token:',t,'hash:',c.createHash('sha256').update(t).digest('hex'));"
+const EXPECTED_HASH = '86e67b91a6366f1ec7d4b39fa4a9d620924f1e60b2839dbb3593a2f80cb898e4';
+
+(async function gate() {
+  const k = new URLSearchParams(window.location.search).get('k') || '';
+  if (!k) return; // no token — stays locked
+  try {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(k));
+    const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    if (hex === EXPECTED_HASH) {
+      document.body.classList.remove('locked');
+    }
+  } catch (_) { /* stays locked on any error */ }
+})();
+// ═══════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════
+const TARGET    = new Date('2026-07-12T17:00:00-04:00').getTime();
+const TRIP_S    = new Date('2026-07-12T00:00:00-04:00');
+const TRIP_E    = new Date('2026-07-26T23:59:59-04:00');
+const DOWS      = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MONTHS    = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const PAGES     = ['trip','calendar','ideas','eat','reference'];
+const PAGE_LABELS = {
+  trip:'Trip', calendar:'Calendar',
+  ideas:'Ideas', eat:'Eat & Book', reference:'Reference'
+};
+
+// ═══════════════════════════════════════════
+// COUNTDOWN (in strip)
+// ═══════════════════════════════════════════
+function tick() {
+  const now  = Date.now();
+  const diff = TARGET - now;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const badge = document.getElementById('brand-badge');
+  const stripCd = document.getElementById('strip-cd');
+
+  // Live trip — show Day X of 14 in nav
+  if (today >= TRIP_S && today <= TRIP_E) {
+    const dayN = Math.floor((today - TRIP_S) / 86400000) + 1;
+    badge.textContent = 'Day ' + dayN + ' / 14';
+    badge.classList.add('live');
+    stripCd.textContent = 'In Corolla';
+    return;
+  }
+
+  // Post-trip
+  if (diff <= 0) {
+    badge.textContent = '';
+    badge.classList.remove('live');
+    stripCd.textContent = 'Trip complete · sea you next year';
+    return;
+  }
+
+  // Pre-trip
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  stripCd.textContent = d + 'd ' + String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+  badge.classList.remove('live');
+}
+tick();
+setInterval(tick, 1000);
+
+// ═══════════════════════════════════════════
+// CALENDAR RENDER
+// ═══════════════════════════════════════════
+const CAL_START = new Date('2026-07-11T00:00:00-04:00'); // Sat Jul 11
+
+// Confirmed facts only — index 0 = Jul 11
+const DAY_DATA = {
+  0:  [{e:'🚗', t:'Leave Plainfield · 4 AM'}, {e:'🏨', t:'Hampton Inn Falls Church · check-in 3 PM'}],
+  1:  [{e:'🏛️', t:'DC · Lincoln + Washington Monument'}, {e:'🔑', t:'Check-in Corolla · 5 PM'}, {e:'🛒', t:'Grocery run'}],
+  15: [{e:'🧳', t:'Check-out · 10 AM'}, {e:'🚗', t:'Drive home'}]
+};
+
+function renderCalendar() {
+  const grid = document.getElementById('calendar-grid');
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  grid.innerHTML = '';
+
+  for (let i = 0; i < 16; i++) {
+    const d = new Date(CAL_START.getTime() + i * 86400000);
+    const dow = DOWS[d.getDay()];
+    const day = d.getDate();
+    const mo  = MONTHS[d.getMonth()];
+
+    const isPretrip = i === 0;
+    const isArrival = i === 1;
+    const isDepart  = i === 15;
+
+    const dC = new Date(d); dC.setHours(0,0,0,0);
+    const isToday = dC.getTime() === today.getTime();
+    const isPast  = dC < today;
+
+    let marker = '';
+    if (isArrival) marker = '<div class="day-marker">🔑 Arrival</div>';
+    if (isDepart)  marker = '<div class="day-marker">🧳 Depart</div>';
+
+    const items = DAY_DATA[i] || [];
+    const itemsHtml = items.length
+      ? '<div class="day-items">' + items.map(it =>
+          '<div class="day-item"><span class="e">' + it.e + '</span><span>' + it.t + '</span></div>'
+        ).join('') + '</div>'
+      : '';
+
+    const classes = ['day'];
+    if (isPretrip)          classes.push('phase-pretrip');
+    else if (isArrival)     classes.push('phase-arrival');
+    else if (isDepart)      classes.push('phase-depart');
+    if (isToday)            classes.push('today');
+    if (isPast && !isToday) classes.push('past');
+
+    const el = document.createElement('div');
+    el.className = classes.join(' ');
+    el.innerHTML = `
+      ${marker}
+      <div class="day-dow">${dow}</div>
+      <div class="day-num">${day}</div>
+      <div class="day-month">${mo}</div>
+      ${itemsHtml}
+    `;
+    grid.appendChild(el);
+  }
+}
+renderCalendar();
+
+// ═══════════════════════════════════════════
+// PAGE SWITCHING
+// ═══════════════════════════════════════════
+const select      = document.getElementById('page-select');
+const pickerLabel = document.getElementById('picker-label');
+
+function showPage(name, opts = {}) {
+  if (!PAGES.includes(name)) return;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const next = document.getElementById('page-' + name);
+  if (!next) return;
+  next.classList.add('active');
+  pickerLabel.textContent = PAGE_LABELS[name];
+  if (select.value !== name) select.value = name;
+  // Scroll to top of page area (under nav + strip)
+  window.scrollTo({ top: 0, behavior: opts.smooth === false ? 'auto' : 'smooth' });
+}
+
+select.addEventListener('change', e => showPage(e.target.value));
+
+// ═══════════════════════════════════════════
+// IDEAS · SUB-TAB FILTERING
+// ═══════════════════════════════════════════
+document.querySelectorAll('.subtab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.subtab').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    const f = btn.dataset.filter;
+    document.querySelectorAll('#page-ideas .cat').forEach(cat => {
+      cat.classList.toggle('hidden', f !== 'all' && cat.dataset.cat !== f);
+    });
+  });
+});
+
+// ═══════════════════════════════════════════
+// SWIPE GESTURES
+// ═══════════════════════════════════════════
+let touchStartX = 0, touchStartY = 0, touchStartT = 0;
+const SWIPE_MIN_X = 60;
+const SWIPE_MAX_Y = 80;
+const SWIPE_MAX_T = 600;
+
+document.body.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1) return;
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  touchStartT = Date.now();
+}, { passive: true });
+
+document.body.addEventListener('touchend', e => {
+  if (!touchStartX) return;
+  const touch = e.changedTouches[0];
+  const dx = touch.clientX - touchStartX;
+  const dy = Math.abs(touch.clientY - touchStartY);
+  const dt = Date.now() - touchStartT;
+  touchStartX = 0;
+
+  if (dt > SWIPE_MAX_T) return;
+  if (dy > SWIPE_MAX_Y) return;
+  if (Math.abs(dx) < SWIPE_MIN_X) return;
+  // Don't swipe if on a scrolling sub-element (subtabs)
+  const target = e.target;
+  if (target.closest('.subtabs')) return;
+  if (target.closest('select')) return;
+
+  const current = document.querySelector('.page.active');
+  if (!current) return;
+  const idx = PAGES.indexOf(current.dataset.page);
+  if (idx === -1) return;
+
+  if (dx < 0 && idx < PAGES.length - 1) {
+    showPage(PAGES[idx + 1]);
+  } else if (dx > 0 && idx > 0) {
+    showPage(PAGES[idx - 1]);
+  }
+}, { passive: true });
+
+// Initial page label sync
+pickerLabel.textContent = PAGE_LABELS[select.value];
+</script>
+
+</body>
+</html>
