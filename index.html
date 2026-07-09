@@ -7,6 +7,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#143A50">
 <title>Morse · OBX 2026</title>
+<meta name="apple-mobile-web-app-title" content="OBX 2026">
+<link id="touch-icon" rel="apple-touch-icon" href="">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
@@ -1609,11 +1611,22 @@ body.locked .app { visibility: hidden; }
       <div class="phone-row"><div class="phone-label">Seaside Vacations<span class="sub">Property manager</span></div><a class="phone-num" href="tel:+12522615500">252-261-5500</a></div>
       <div class="phone-row"><div class="phone-label">Seaside Vacations<span class="sub">Toll-free</span></div><a class="phone-num" href="tel:+18003952525">800-395-2525</a></div>
       <div class="phone-row"><div class="phone-label">Seaside Vacations Email<span class="sub">rentals@seasideobx.com</span></div><a class="phone-num" href="mailto:rentals@seasideobx.com">Email</a></div>
-      <div class="phone-row"><div class="phone-label">Outer Banks Hospital<span class="sub">Nags Head · ~1 hr south</span></div><span class="phone-num tbd">TBD</span></div>
-      <div class="phone-row"><div class="phone-label">Nearest Urgent Care<span class="sub">verify closest to Corolla</span></div><span class="phone-num tbd">TBD</span></div>
-      <div class="phone-row"><div class="phone-label">CVS / Pharmacy<span class="sub">Corolla area</span></div><span class="phone-num tbd">TBD</span></div>
-      <div class="phone-row"><div class="phone-label">Wild Horse Tour Operator<span class="sub">once booked</span></div><span class="phone-num tbd">TBD</span></div>
-      <div class="phone-row"><div class="phone-label">Food Lion Corolla<span class="sub">closest grocery</span></div><span class="phone-num tbd">TBD</span></div>
+      <div class="phone-row">
+        <div class="phone-label"><a href="https://maps.apple.com/?q=4800+S+Croatan+Hwy,+Nags+Head,+NC+27959" style="color:inherit;text-decoration:none;">Outer Banks Health Hospital</a><span class="sub">4800 S Croatan Hwy, Nags Head · ~1 hr · 24 hrs ER</span></div>
+        <a class="phone-num" href="tel:+12524494500">252-449-4500</a>
+      </div>
+      <div class="phone-row">
+        <div class="phone-label"><a href="https://maps.apple.com/?q=1129+Corolla+Village+Rd,+Corolla,+NC+27927" style="color:inherit;text-decoration:none;">Lighthouse Medical Care</a><span class="sub">1129 Corolla Village Rd · in Corolla · cash/credit only</span></div>
+        <a class="phone-num" href="tel:+12525971157">252-597-1157</a>
+      </div>
+      <div class="phone-row">
+        <div class="phone-label"><a href="https://maps.apple.com/?q=5547+N+Croatan+Hwy,+Southern+Shores,+NC+27949" style="color:inherit;text-decoration:none;">CVS Pharmacy</a><span class="sub">5547 N Croatan Hwy, Southern Shores · ~20 min south</span></div>
+        <a class="phone-num" href="tel:+12522618097">252-261-8097</a>
+      </div>
+      <div class="phone-row">
+        <div class="phone-label"><a href="https://maps.apple.com/?q=805+Ocean+Trail,+Corolla,+NC+27927" style="color:inherit;text-decoration:none;">Food Lion Corolla</a><span class="sub">805 Ocean Trail · closest grocery · 7 AM–10 PM daily</span></div>
+        <a class="phone-num" href="tel:+12524534544">252-453-4544</a>
+      </div>
     </div>
   </section>
 
@@ -1622,6 +1635,30 @@ body.locked .app { visibility: hidden; }
 <!-- FAB removed in v11 -->
 
 <script>
+// ═══════════════════════════════════════════
+// HOME SCREEN ICON — generated at runtime
+// Black background, gold "OBX" — no external image file needed
+// ═══════════════════════════════════════════
+(function buildIcon() {
+  const SIZE = 180;
+  const c = document.createElement('canvas');
+  c.width = SIZE;
+  c.height = SIZE;
+  const ctx = c.getContext('2d');
+
+  // Black background with rounded corners (iOS clips anyway, but looks clean)
+  ctx.fillStyle = '#000000';
+  ctx.fillRect(0, 0, SIZE, SIZE);
+
+  // Gold "OBX"
+  ctx.fillStyle = '#D9B86A';
+  ctx.font = 'bold 62px Georgia, serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('OBX', SIZE / 2, SIZE / 2);
+
+  document.getElementById('touch-icon').href = c.toDataURL('image/png');
+})();
 // ═══════════════════════════════════════════
 // TOKEN GATE
 // SHA-256 hash of the access token.
